@@ -374,7 +374,7 @@ public class MobileScannerPlugin: NSObject, FlutterPlugin, FlutterStreamHandler,
 #endif
         
         if (device == nil) {
-            device = AVCaptureDevice.devices(for: .video).filter({$0.position == position}).first
+            device = AVCaptureDevice.default(for: .video)
         }
         
         if (device == nil) {

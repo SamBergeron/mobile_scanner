@@ -50,6 +50,7 @@ class _MobileScannerAdvancedState extends State<MobileScannerAdvanced> {
   bool autoZoom = false;
   bool invertImage = false;
   bool returnImage = false;
+  bool tapToFocus = true;
 
   Size desiredCameraResolution = const Size(1920, 1080);
   DetectionSpeed detectionSpeed = DetectionSpeed.unrestricted;
@@ -302,6 +303,7 @@ class _MobileScannerAdvancedState extends State<MobileScannerAdvanced> {
                     // useAppLifecycleState: false, // Only set to false if you want
                     // to handle lifecycle changes yourself
                     scanWindow: useScanWindow ? scanWindow : null,
+                    tapToFocus: true,
                     controller: controller,
                     errorBuilder: (context, error) {
                       return ScannerErrorWidget(error: error);
@@ -381,7 +383,8 @@ class _MobileScannerAdvancedState extends State<MobileScannerAdvanced> {
                               barcodes: controller!.barcodes,
                             ),
                           ),
-                          if (!kIsWeb) ZoomScaleSlider(controller: controller!),
+                          if (!kIsWeb)
+                            ZoomScaleSlider(controller: controller!),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                             children: [

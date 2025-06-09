@@ -34,6 +34,7 @@ class MobileScannerController extends ValueNotifier<MobileScannerState> {
     this.torchEnabled = false,
     this.invertImage = false,
     this.autoZoom = false,
+    this.initialZoom = 0,
   }) : detectionTimeoutMs =
            detectionSpeed == DetectionSpeed.normal ? detectionTimeoutMs : 0,
        assert(
@@ -112,6 +113,13 @@ class MobileScannerController extends ValueNotifier<MobileScannerState> {
   ///
   /// Only supported on Android.
   final bool autoZoom;
+
+  /// If set this sets the zoom scale factor when the camera launches
+  /// this avoids having to add a callback to modify the zoom to start at
+  /// a specific position
+  ///
+  /// Only support on iOS
+  final double initialZoom;
 
   /// The internal barcode controller, that listens for detected barcodes.
   final StreamController<BarcodeCapture> _barcodesController =
@@ -319,6 +327,27 @@ class MobileScannerController extends ValueNotifier<MobileScannerState> {
     await MobileScannerPlatform.instance.setZoomScale(clampedZoomScale);
   }
 
+  /// Set the focus point for the camera.
+  ///
+  /// The [position] must be between an offset with X, Y coordinates.
+  ///
+  /// Does nothing if the camera is not running.
+  Future<void> setFocusPoint(Offset position) async {
+    _throwIfNotInitialized();
+
+    if (!value.isRunning) {
+      return;
+    }
+
+    // Clamp coordinates to make sure they are between 1 and 0
+    final Offset clampedPosition = Offset(
+      position.dx.clamp(0, 1),
+      position.dy.clamp(0, 1),
+    );
+
+    await MobileScannerPlatform.instance.setFocusPoint(clampedPosition);
+  }
+
   /// Start scanning for barcodes.
   ///
   /// The [cameraDirection] can be used to specify the camera direction.
@@ -408,6 +437,7 @@ class MobileScannerController extends ValueNotifier<MobileScannerState> {
       torchEnabled: torchEnabled,
       invertImage: invertImage,
       autoZoom: autoZoom,
+      initialZoom: initialZoom,
     );
 
     try {
